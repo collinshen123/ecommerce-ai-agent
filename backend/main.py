@@ -1,9 +1,7 @@
-from fastapi import FastAPI, UploadFile
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from services import text_recommend, image_recommend
-from services.agent_chat import chat
 from pydantic import BaseModel
-
+from services.agent import agent  # your agent from earlier
 
 class ChatRequest(BaseModel):
     query: str
@@ -22,14 +20,12 @@ app.add_middleware(
 def root():
     return {"message": "AI Commerce Agent is running."}
 
-@app.post("/recommend")
-async def recommend_products(query: str):
-    return text_recommend.recommend_products(query)
-
-@app.post("/image-search")
-async def search_image(file: UploadFile):
-    return image_recommend.search_by_image(file)
-
 @app.post("/chat")
 async def chat_with_agent(payload: ChatRequest):
-    return chat(payload.query)
+    # Build a message list for the agent as per LangChain format
+    messages = [{"role": "user", "content": payload.query}]
+    response = agent.invoke({"messages": messages})
+    # If you want just the result text, extract it based on your agent's output schema
+    if isinstance(response, dict) and "output" in response:
+        return {"response": response["output"]}
+    return {"response": response}

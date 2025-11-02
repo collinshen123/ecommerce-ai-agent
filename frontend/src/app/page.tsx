@@ -73,34 +73,25 @@ export default function Home() {
     setIsLoading(true);
 
     try {
-      let response;
 
+      const formData = new FormData();
       if (selectedImage) {
-        const formData = new FormData();
         formData.append("file", selectedImage);
-        const res = await fetch(`\${API_BASE}/image-search`, {
-          method: "POST",
-          body: formData,
-        });
-        response = await res.json();
-        removeImage();
-      } else if (inputMessage.toLowerCase().includes("recommend") || inputMessage.toLowerCase().includes("find") || inputMessage.toLowerCase().includes("looking for")) {
-        const res = await fetch(`\${API_BASE}/recommend?query=\${encodeURIComponent(inputMessage)}`, {
-          method: "POST",
-        });
-        response = await res.json();
-      } else {
-        const res = await fetch("http://127.0.0.1:8000/chat", {
-          method: "POST",
-          headers: {
-            "Accept": "application/json",
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ query: inputMessage }),
-        });
-
-        response = await res.json();
       }
+      if (inputMessage) {
+        formData.append("query", inputMessage);
+      }
+
+      const res = await fetch(`${API_BASE}/chat`, {
+        method: "POST",
+        body: formData, // Works for text-only, image-only, or both
+      });
+
+      if (!res.ok) throw new Error("Request failed");
+      const response = await res.json();
+
+      // Clean up
+      removeImage();
 
 
 
