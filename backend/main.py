@@ -22,10 +22,17 @@ def root():
 
 @app.post("/chat")
 async def chat_with_agent(payload: ChatRequest):
-    # Build a message list for the agent as per LangChain format
     messages = [{"role": "user", "content": payload.query}]
     response = agent.invoke({"messages": messages})
-    # If you want just the result text, extract it based on your agent's output schema
-    if isinstance(response, dict) and "output" in response:
-        return {"response": response["output"]}
-    return {"response": response}
+
+    # Get all messages
+    all_messages = response["messages"]
+
+    # Find the last AIMessage that has actual content (not tool calls only)
+    final_content = ""
+    for msg in reversed(all_messages):
+        if msg.type == "ai" and msg.content:  # Has text content
+            final_content = msg.content
+            break
+
+    return {"response": final_content}

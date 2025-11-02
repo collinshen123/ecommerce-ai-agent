@@ -58,63 +58,56 @@ export default function Home() {
   };
 
   const handleSendMessage = async () => {
-    if (!inputMessage.trim() && !selectedImage) return;
+    if (!inputMessage.trim()) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
       type: "user",
-      content: inputMessage || "Searching by image...",
-      image: imagePreview || undefined,
+      content: inputMessage,
       timestamp: new Date(),
     };
 
+    // Add user message immediately
     setMessages((prev) => [...prev, userMessage]);
     setInputMessage("");
     setIsLoading(true);
 
     try {
-
-      const formData = new FormData();
-      if (selectedImage) {
-        formData.append("file", selectedImage);
-      }
-      if (inputMessage) {
-        formData.append("query", inputMessage);
-      }
-
       const res = await fetch(`${API_BASE}/chat`, {
         method: "POST",
-        body: formData, // Works for text-only, image-only, or both
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ query: inputMessage }),
       });
 
-      if (!res.ok) throw new Error("Request failed");
-      const response = await res.json();
+      if (!res.ok) throw new Error("Network response was not ok");
 
-      // Clean up
-      removeImage();
+      const data = await res.json();
 
+      // Extract the LLM response text
+      const botResponse = data.response;
 
-
-      const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
+      const botMessage: Message = {
+        id: Date.now().toString(),
         type: "assistant",
-        content: response.response || response.message || JSON.stringify(response),
-        products: response.products || response.recommendations,
+        content: botResponse,
         timestamp: new Date(),
       };
 
-      setMessages((prev) => [...prev, assistantMessage]);
+      setMessages((prev) => [...prev, botMessage]);
     } catch (error) {
       const errorMessage: Message = {
-        id: (Date.now() + 1).toString(),
+        id: Date.now().toString(),
         type: "assistant",
-        content: "Sorry, I encountered an error. Please make sure the backend is running and try again.",
+        content: "Sorry, something went wrong. Please try again.",
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
     }
+  
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
