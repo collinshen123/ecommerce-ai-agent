@@ -58,12 +58,13 @@ export default function Home() {
   };
 
   const handleSendMessage = async () => {
-    if (!inputMessage.trim()) return;
+    if (!inputMessage.trim() && !selectedImage) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
       type: "user",
-      content: inputMessage,
+      content: inputMessage || "",
+      image: imagePreview || undefined,
       timestamp: new Date(),
     };
 
@@ -73,41 +74,46 @@ export default function Home() {
     setIsLoading(true);
 
     try {
+      // Always submit to /chat endpoint, support both image and text
+      const formData = new FormData();
+      if (selectedImage) {
+        formData.append("image", selectedImage);
+      }
+      formData.append("query", inputMessage);
+
       const res = await fetch(`${API_BASE}/chat`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ query: inputMessage }),
+        body: formData,
       });
 
       if (!res.ok) throw new Error("Network response was not ok");
 
       const data = await res.json();
 
-      // Extract the LLM response text
-      const botResponse = data.response;
+      const botResponse = data.response || data.message || "Here's what I found for you!";
 
       const botMessage: Message = {
         id: Date.now().toString(),
         type: "assistant",
         content: botResponse,
+        image: data.image_url,
+        products: data.products || [],
         timestamp: new Date(),
       };
 
       setMessages((prev) => [...prev, botMessage]);
+      removeImage();
     } catch (error) {
       const errorMessage: Message = {
         id: Date.now().toString(),
         type: "assistant",
-        content: "Sorry, something went wrong. Please try again.",
+        content: "Sorry, something went wrong while sending your message. Please try again.",
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
     }
-  
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {

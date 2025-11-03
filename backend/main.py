@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, File, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from services.agent import agent
@@ -21,8 +21,14 @@ def root():
     return {"message": "AI Commerce Agent is running."}
 
 @app.post("/chat")
-async def chat_with_agent(payload: ChatRequest):
-    messages = [{"role": "user", "content": payload.query}]
+async def chat_with_agent(query: str = Form(...), image: UploadFile | None = File(None)):
+    messages = [{"role": "user", "content": query}]
+
+    # If an image is provided, optionally process or store it here
+    if image:
+        image_bytes = await image.read()
+        # You can pass this image data to another service or model later
+
     response = agent.invoke({"messages": messages})
 
     # Get all messages
