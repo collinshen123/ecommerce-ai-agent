@@ -53,8 +53,24 @@ def image_search(file: UploadFile) -> dict:
     else:
         response_items.append({"message": "No similar products found."})
 
+    # Ensure response is safe and easily serializable for frontend rendering
+    safe_results = []
+    for item in response_items:
+        if "message" in item:
+            safe_results.append(item)
+        else:
+            safe_results.append({
+                "title": str(item.get("title", "")),
+                "brand": str(item.get("brand", "")),
+                "category": str(item.get("category", "")),
+                "price": float(item.get("price", 0.0)) if item.get("price") else None,
+                "image_url": str(item.get("image_url", "")),
+                "rating": float(item.get("rating", 0.0)) if item.get("rating") else None,
+                "distance": float(item.get("distance", 0.0))
+            })
+
     return {
         "type": "image_search",
         "query_file": file.filename,
-        "results": response_items
+        "results": safe_results
     }

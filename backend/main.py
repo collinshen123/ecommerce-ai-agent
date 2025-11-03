@@ -24,20 +24,35 @@ def root():
 async def chat_with_agent(query: str = Form(...), image: UploadFile | None = File(None)):
     messages = [{"role": "user", "content": query}]
 
-    # If an image is provided, optionally process or store it here
+    # If an image is provided, trigger image_search directly
     if image:
-        image_bytes = await image.read()
-        # You can pass this image data to another service or model later
+        from services.image_recommend import image_search
+        # The @tool decorator wraps the function, so retrieve the original callable
+        result = image_search.func(image)
+        # Return only a text-safe summary message for React rendering
+        summary = "Here are similar products:\n"
+        for item in result["results"]:
+            if "message" in item:
+                summary += f"- {item['message']}\n"
+            else:
+                summary += (
+                    f"- {item.get('title', 'Unknown')} by {item.get('brand', 'Unknown')} "
+                    f"(${item.get('price', 'N/A')}, Rating: {item.get('rating', 'N/A')})\n"
+                )
 
+        return {
+            "response": summary.strip(),
+            "query_file": result["query_file"],
+            "type": result["type"]
+        }
+
+    # Otherwise, handle text-based query through the conversational agent
     response = agent.invoke({"messages": messages})
 
-    # Get all messages
-    all_messages = response["messages"]
-
-    # Find the last AIMessage that has actual content (not tool calls only)
+    # Extract the last AI message
     final_content = ""
-    for msg in reversed(all_messages):
-        if msg.type == "ai" and msg.content:  # Has text content
+    for msg in reversed(response["messages"]):
+        if getattr(msg, "type", None) == "ai" and getattr(msg, "content", ""):
             final_content = msg.content
             break
 
