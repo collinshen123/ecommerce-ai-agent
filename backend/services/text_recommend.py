@@ -1,5 +1,4 @@
 import chromadb
-from langchain_core.messages import HumanMessage, ToolMessage
 from langchain_core.tools import tool
 
 client = chromadb.PersistentClient(path="./data/chroma_db")
@@ -64,7 +63,7 @@ def search_product(
 
     results = collection.query(
         query_texts=[query],
-        n_results=10,
+        n_results=3,
         where=where_clause,
         include=["metadatas", "distances", "documents"]
     )

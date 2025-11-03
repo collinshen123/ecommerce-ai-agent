@@ -9,7 +9,7 @@ from langgraph.checkpoint.memory import MemorySaver
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage, ToolMessage
 from langchain_core.tools import tool
-from .text_recommend import search_product
+from ..services.text_recommend import search_product
 
 
 # Use your own key here
