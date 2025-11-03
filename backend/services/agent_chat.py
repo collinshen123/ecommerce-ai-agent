@@ -29,20 +29,22 @@ graph.add_node("agent", agent_node)
 graph.set_entry_point("agent")
 graph.add_edge("agent", END)
 
-# Create the LangGraph app
+
 memory = MemorySaver()
-agent_app = graph.compile(checkpointer=memory)
+app = graph.compile(checkpointer=memory)
 
-# 5. Compile the app
-app = graph.compile()
-
-def chat(query: str):
-    result = app.invoke({"query": query})
-    print("AI:", result["response"])
-    return {"response": result["response"]}
+def chat(query: str, thread_id: str = "default_user"):
+    result = app.invoke(
+        {"query": query, "response": "", "tool_calls": []},
+        config={"configurable": {"thread_id": thread_id}}
+    )
+    return result
 
 # 6. Run example
 if __name__ == "__main__":
     user_query = input("User: ")
     result = app.invoke({"query": user_query})
     print("AI:", result["response"])
+
+
+
