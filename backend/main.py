@@ -2,6 +2,7 @@ from fastapi import FastAPI, File, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from services.agent import agent
+from services.agent import run_agent
 
 class ChatRequest(BaseModel):
     query: str
@@ -24,32 +25,13 @@ def root():
 async def chat_with_agent(query: str = Form(...), image: UploadFile | None = File(None)):
     messages = [{"role": "user", "content": query}]
 
-    # If an image is provided, trigger image_search directly
-    if image:
-        from services.image_recommend import image_search
-        # The @tool decorator wraps the function, so retrieve the original callable
-        result = image_search.func(image)
-        # Return only a text-safe summary message for React rendering
-        summary = "Here are similar products:\n"
-        for item in result["results"]:
-            if "message" in item:
-                summary += f"- {item['message']}\n"
-            else:
-                summary += (
-                    f"- {item.get('title', 'Unknown')} by {item.get('brand', 'Unknown')} "
-                    f"(${item.get('price', 'N/A')}, Rating: {item.get('rating', 'N/A')})\n"
-                )
+    # Let the agent decide which tool to invoke
+    inputs = {"messages": messages}
+    if image is not None:
+        inputs["image"] = image
+    response = run_agent(query, image)
 
-        return {
-            "response": summary.strip(),
-            "query_file": result["query_file"],
-            "type": result["type"]
-        }
-
-    # Otherwise, handle text-based query through the conversational agent
-    response = agent.invoke({"messages": messages})
-
-    # Extract the last AI message
+    # Extract final AI message content
     final_content = ""
     for msg in reversed(response["messages"]):
         if getattr(msg, "type", None) == "ai" and getattr(msg, "content", ""):

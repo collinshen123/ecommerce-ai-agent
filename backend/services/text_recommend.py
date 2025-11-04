@@ -59,7 +59,12 @@ def search_product(
     if brand is not None:
         filters.append({"brand": brand})
     
-    where_clause = {"$and": filters} if filters else None
+    if not filters:
+        where_clause = None
+    elif len(filters) == 1:
+        where_clause = filters[0]
+    else:
+        where_clause = {"$and": filters}
 
     results = collection.query(
         query_texts=[query],
