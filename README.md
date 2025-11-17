@@ -74,14 +74,40 @@ npm run dev
 
 ## 🐳 Docker Deployment
 
-To run both frontend and backend together:
+You can run the entire application (both backend and frontend) using **Docker Compose**.
+
+### 1. Prerequisites
+- Ensure you have **Docker** and **Docker Compose** installed.
+- You must provide your own **OpenAI API key**.
+
+### 2. Provide your OpenAI API key
+The backend service expects the key to be available as an environment variable named `OPENAI_API_KEY`.
+
+You can provide it in one of two ways:
+
+**Inline when running:**
 ```bash
-docker build -t ecommerce-ai-agent .
-docker run -p 3000:3000 -p 8000:8000 ecommerce-ai-agent
+OPENAI_API_KEY=sk-xxxx docker-compose up --build
+```
+
+Then run:
+```bash
+docker-compose up --build
+```
+
+> Replace `sk-xxxx` with your actual OpenAI API key.
+
+### 3. Access the app
+- Frontend: [http://localhost:3000](http://localhost:3000)
+- Backend: [http://localhost:8000](http://localhost:8000)
+
+### 4. Stop the containers
+```bash
+docker-compose down
 ```
 
 ---
 
-## 🧑‍💻 Author
-**Collin Shen**  
-AI Engineer & Full-Stack Developer  
+## 👨‍💻 Author
+**Collin Shen**
+AI Engineer & Full-Stack Developer
