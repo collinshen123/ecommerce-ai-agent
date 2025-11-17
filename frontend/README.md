@@ -1,36 +1,92 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 💻 Frontend — Ecommerce AI Agent
 
-## Getting Started
+This is the **Next.js 16 frontend** for the Ecommerce AI Agent project.  
+It provides a modern, responsive interface for interacting with the AI-powered recommendation system.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## ⚙️ Tech Stack
+
+- **Next.js 16** (React 19)
+- **TypeScript**
+- **TailwindCSS 4**
+- **React Compiler (experimental)**
+- **ESLint 9** for linting and code quality
+
+---
+
+## 🧠 Design Overview
+
+- Built using the **App Router** architecture (`src/app/`).
+- Uses **server components** for performance and scalability.
+- Communicates with the **FastAPI backend** via REST API calls.
+- Designed for **AI-driven product discovery** — users can input text or upload images to get recommendations.
+
+---
+
+## 🧩 Directory Structure
+
+```
+frontend/
+├── public/           # Static assets
+├── src/
+│   ├── app/
+│   │   ├── layout.tsx
+│   │   ├── page.tsx
+│   │   └── globals.css
+│   └── styles/       # Tailwind and global styles
+├── package.json
+├── next.config.ts
+└── tsconfig.json
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🧰 Setup Instructions
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 1. Install dependencies
+```bash
+npm install
+```
 
-## Learn More
+### 2. Run the development server
+```bash
+npm run dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+### 3. Build for production
+```bash
+npm run build
+npm start
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 4. Access the app
+- Local: http://localhost:3000
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## 🔗 API Integration
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The frontend communicates with the backend via:
+```
+POST http://localhost:8000/chat
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Form fields:
+- `query`: text input
+- `image`: optional image file
+
+---
+
+## 🧪 Linting and Formatting
+
+Run ESLint:
+```bash
+npm run lint
+```
+
+---
+
+## 🧑‍💻 Author
+**Collin Shen**  
+AI Engineer & Full-Stack Developer  

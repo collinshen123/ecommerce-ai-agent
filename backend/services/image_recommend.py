@@ -1,7 +1,6 @@
 from fastapi import UploadFile
 from PIL import Image
 import io
-import torch
 from sentence_transformers import SentenceTransformer
 import chromadb
 from langchain_core.tools import tool

@@ -1,7 +1,6 @@
 from fastapi import FastAPI, File, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from services.agent import agent
 from services.agent import run_agent
 
 class ChatRequest(BaseModel):
